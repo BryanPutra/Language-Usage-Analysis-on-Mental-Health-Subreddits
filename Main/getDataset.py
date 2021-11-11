@@ -27,13 +27,29 @@ reddit = praw.Reddit(
 
 df = pd.DataFrame()
 
+# get account age
+def getAccountAge(submission):
+    user = reddit.redditor(submission.author.name)
+    accCreated = user.created_utc
+    return accCreated
+
+def printSubmissionAttributes(submission):
+    pprint.pprint(vars(submission))
+
+
+
 # Change subreddit to get datasets from other subreddit topic for now its r/suicidewatch
 
-for submission in reddit.subreddit('SuicideWatch').hot(limit= 1000):
+for submission in reddit.subreddit('SuicideWatch').new(limit= 1):
 
     # print('Title: {},\nUsername: {},\nContent Post: {},\nUpvotes: {},\nAwards: {}'.format(submission.title, submission.author.name, submission.selftext, submission.ups, submission.all_awardings))
     if not submission.stickied and submission.is_self:
-        # pprint.pprint(vars(submission))
+        
+        # print(getAccountAge(submission))
+
+        # printSubmissionAttributes(submission)
+
+        # append somewhat cleaned data to dataframe
         # df = df.append({
         #     'Title': submission.title,
         #     'Username': submission.author,
@@ -43,8 +59,9 @@ for submission in reddit.subreddit('SuicideWatch').hot(limit= 1000):
         #     'CreatedOn': submission.created_utc
         # }, ignore_index=True)
 
+        # append raw data to dataframe
         # df = df.append(vars(submission), ignore_index=True)
 
 # print(df)
 
-df.to_csv('SuicideWatchRaw.csv', index=False)
+# df.to_csv('SuicideWatchRaw.csv', index=False)
