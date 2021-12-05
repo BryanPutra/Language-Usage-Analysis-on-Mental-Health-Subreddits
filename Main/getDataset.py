@@ -33,39 +33,38 @@ def getAccountAge(submission):
     user = reddit.redditor(submission.author.name)
     createdEpoch = user.created_utc
     currentEpoch = datetime.now().timestamp()
-    print(currentEpoch)
     age = int(currentEpoch - createdEpoch)
     return age
 
 def printSubmissionAttributes(submission):
     pprint.pprint(vars(submission))
 
-
-
 # Change subreddit to get datasets from other subreddit topic for now its r/suicidewatch
-
-for submission in reddit.subreddit('SuicideWatch').new(limit= 1):
-
-    # print('Title: {},\nUsername: {},\nContent Post: {},\nUpvotes: {},\nAwards: {}'.format(submission.title, submission.author.name, submission.selftext, submission.ups, submission.all_awardings))
+for submission in reddit.subreddit('SuicideWatch').new(limit = 5):
     if not submission.stickied and submission.is_self:
+        authorName = ""
+        
+        if(submission.selftext == '[deleted]' or submission.selftext == '[removed]'):
+            # Ignore deleted submissions
+            continue
+        elif(not (submission.author is None)):
+            authorName = submission.author.name
+        
+        submissionContent = submission.selftext.replace("\n", "")
         accountAge = getAccountAge(submission)
+        
+        # Preprocess goes here
 
-        # printSubmissionAttributes(submission)
-
-        # append somewhat cleaned data to dataframe
         df = df.append({
             'Title': submission.title,
-            'Username': submission.author.name,
-            'Content': submission.selftext,
+            'Username': authorName,
+            'Content': submissionContent,
             'Upvotes': submission.ups,
             'NumberOfComments': submission.num_comments,
             'CreatedOn': submission.created_utc,
             'AccountAgeMili' : accountAge,
         }, ignore_index=True)
-
-        # append raw data to dataframe
-        # df = df.append(vars(submission), ignore_index=True)
-df.to_csv('test.csv', index=False)
+df.to_csv('SuicideWatchCleaned.csv', index=False)
 
 # print(df)
 
