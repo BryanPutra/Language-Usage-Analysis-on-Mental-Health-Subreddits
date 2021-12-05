@@ -1,14 +1,15 @@
 import praw
 import pprint
 import pandas as pd
+from datetime import datetime
 from config import REDDIT_API as redditCredentials
 
 reddit = praw.Reddit(
-    client_id=redditCredentials['clientID'],
-    client_secret=redditCredentials['secretKey'],
-    user_agent=redditCredentials['userAgent'],
-    username=redditCredentials['username'],
-    password=redditCredentials['password']
+    client_id = redditCredentials['clientID'],
+    client_secret = redditCredentials['secretKey'],
+    user_agent = redditCredentials['userAgent'],
+    username = redditCredentials['username'],
+    password = redditCredentials['password']
 )
 
 # top_level_comments = list(submission.comments)
@@ -30,8 +31,11 @@ df = pd.DataFrame()
 # get account age
 def getAccountAge(submission):
     user = reddit.redditor(submission.author.name)
-    accCreated = user.created_utc
-    return accCreated
+    createdEpoch = user.created_utc
+    currentEpoch = datetime.now().timestamp()
+    print(currentEpoch)
+    age = int(currentEpoch - createdEpoch)
+    return age
 
 def printSubmissionAttributes(submission):
     pprint.pprint(vars(submission))
@@ -44,24 +48,24 @@ for submission in reddit.subreddit('SuicideWatch').new(limit= 1):
 
     # print('Title: {},\nUsername: {},\nContent Post: {},\nUpvotes: {},\nAwards: {}'.format(submission.title, submission.author.name, submission.selftext, submission.ups, submission.all_awardings))
     if not submission.stickied and submission.is_self:
-        
-        # print(getAccountAge(submission))
+        accountAge = getAccountAge(submission)
 
         # printSubmissionAttributes(submission)
 
         # append somewhat cleaned data to dataframe
-        # df = df.append({
-        #     'Title': submission.title,
-        #     'Username': submission.author,
-        #     'Content': submission.selftext,
-        #     'Upvotes': submission.ups,
-        #     'NumberOfComments': submission.num_comments,
-        #     'CreatedOn': submission.created_utc
-        # }, ignore_index=True)
+        df = df.append({
+            'Title': submission.title,
+            'Username': submission.author.name,
+            'Content': submission.selftext,
+            'Upvotes': submission.ups,
+            'NumberOfComments': submission.num_comments,
+            'CreatedOn': submission.created_utc,
+            'AccountAgeMili' : accountAge,
+        }, ignore_index=True)
 
         # append raw data to dataframe
         # df = df.append(vars(submission), ignore_index=True)
+df.to_csv('test.csv', index=False)
 
 # print(df)
 
-# df.to_csv('SuicideWatchRaw.csv', index=False)
