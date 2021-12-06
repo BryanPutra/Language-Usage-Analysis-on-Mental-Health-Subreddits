@@ -1,6 +1,12 @@
 import praw
 import pprint
 import pandas as pd
+import re
+
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+
 from datetime import datetime
 from config import REDDIT_API as redditCredentials
 
@@ -29,42 +35,49 @@ reddit = praw.Reddit(
 df = pd.DataFrame()
 
 # get account age
-def getAccountAge(submission):
-    user = reddit.redditor(submission.author.name)
-    createdEpoch = user.created_utc
-    currentEpoch = datetime.now().timestamp()
-    age = int(currentEpoch - createdEpoch)
-    return age
+def getAccountAge(authorName):
+    createdEpoch = 0
+    redditor = reddit.redditor(authorName)
+    try:
+        createdEpoch = redditor.created_utc
+    except AttributeError:
+        print(authorName)
+        print("Could not get attribute")
+    return createdEpoch
 
 def printSubmissionAttributes(submission):
     pprint.pprint(vars(submission))
 
-# Change subreddit to get datasets from other subreddit topic for now its r/suicidewatch
-for submission in reddit.subreddit('SuicideWatch').new(limit = 5):
+# Change subreddit to get datasets from other subreddit topic
+subredditName = 'suicideWatch'
+for submission in reddit.subreddit(subredditName).hot(limit = 1000):
     if not submission.stickied and submission.is_self:
         authorName = ""
-        
+        accountAge = 0
         if(submission.selftext == '[deleted]' or submission.selftext == '[removed]'):
             # Ignore deleted submissions
             continue
         elif(not (submission.author is None)):
             authorName = submission.author.name
-        
-        submissionContent = submission.selftext.replace("\n", "")
-        accountAge = getAccountAge(submission)
-        
-        # Preprocess goes here
+            accountAge = getAccountAge(authorName)
 
+        if(not submission.selftext is None):
+            submissionContent = submission.selftext.replace("\n", "")
+        
+        # Lowercase content
+        submissionTitle = submission.title.lower()
+        submissionContent = submissionContent.lower()
+        
         df = df.append({
-            'Title': submission.title,
+            'Title': submissionTitle,
             'Username': authorName,
             'Content': submissionContent,
             'Upvotes': submission.ups,
             'NumberOfComments': submission.num_comments,
-            'CreatedOn': submission.created_utc,
-            'AccountAgeMili' : accountAge,
+            'AccountCreatedEpoch' : accountAge,
+            'Subreddit' : subredditName
         }, ignore_index=True)
-df.to_csv('SuicideWatchCleaned.csv', index=False)
+df.to_csv(subredditName + 'Cleaned.csv', index=False)
 
 # print(df)
 
