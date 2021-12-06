@@ -5,6 +5,7 @@ import dataframeUtility
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report
 
 cv = CountVectorizer()
