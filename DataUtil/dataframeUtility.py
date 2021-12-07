@@ -19,3 +19,32 @@ def removePunctuationInColumn(df, column):
 
 def addPrefixToStringColumn(df, column, prefix):
     df[column] = prefix + df[column].astype(str)
+    return df[column]
+
+def createDataframe(subredditList : list, featureColumnList : list):
+    df = []
+    label = {}
+    featureColumn = 'Feature' + ''.join(featureColumnList)
+    
+    # Combines all the file into one big dataframe
+    for count, s in enumerate(subredditList):
+        df.append(pd.read_csv(os.path.dirname(__file__) + '/../Datasets/' + s + 'Cleaned.csv'))
+        label[s] = count
+    df = pd.concat(df)
+    
+    # Creates a new column based on the combined features
+    df[featureColumn] = ""
+    for count, i in enumerate(featureColumnList):
+        df = fillColumnWithEmptyString(df, i)
+        if(count != 0):
+            df[featureColumn] += addPrefixToStringColumn(df, i, prefix = ' ')
+        else:
+            df[featureColumn] += df[i]
+    removePunctuationInColumn(df, featureColumn)
+    
+    # Preprocessing goes here
+    print(df[featureColumn].head(10))
+    df['Label'] = df['Subreddit'].map(label)
+    df = df.sample(frac = 1)
+    return df, featureColumn
+    
