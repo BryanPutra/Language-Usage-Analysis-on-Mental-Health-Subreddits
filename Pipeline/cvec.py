@@ -24,10 +24,11 @@ def cvec(df : DataFrame, xColumn : str, yColumn : str, clf):
 
     y_pred = clf.predict(X_test)
     print(classification_report(y_test, y_pred)) 
-    ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
-    plt.show()
+   
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,5))
+
+    ConfusionMatrixDisplay.from_predictions(y_test, y_pred, ax= ax1)
+    RocCurveDisplay.from_predictions(y_test, y_pred, ax = ax2)
     
-    RocCurveDisplay.from_predictions(y_test, y_pred)
-    plt.plot([0, 1], [0, 1], 'k--')
     plt.show()
     
