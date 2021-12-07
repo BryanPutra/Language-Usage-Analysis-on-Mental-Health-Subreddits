@@ -50,7 +50,11 @@ def printSubmissionAttributes(submission):
 
 # Change subreddit to get datasets from other subreddit topic
 subredditName = 'depression'
-for submission in reddit.subreddit(subredditName).hot(limit = 1000):
+
+
+# Change subreddit to get datasets from other subreddit topic for now its r/suicidewatch
+for submission in reddit.subreddit(subredditName).hot(limit = 1):
+    # print('Title: {},\nUsername: {},\nContent Post: {},\nUpvotes: {},\nAwards: {}'.format(submission.title, submission.author.name, submission.selftext, submission.ups, submission.all_awardings))
     if not submission.stickied and submission.is_self:
         authorName = ""
         accountAge = 0
@@ -81,3 +85,23 @@ df.to_csv(subredditName + 'Cleaned.csv', index=False)
 
 # print(df)
 
+        # print(getAccountAge(submission))  
+
+        # printSubmissionAttributes(submission)
+
+        # append somewhat cleaned data to dataframe
+        # df = df.append({
+        #     'Title': submission.title,
+        #     'Username': submission.author,
+        #     'Content': submission.selftext.replace("\n", ""),
+        #     'Upvotes': submission.ups,
+        #     'NumberOfComments': submission.num_comments,
+        #     'CreatedOn': submission.created_utc
+        # }, ignore_index=True)
+
+        # append raw data to dataframe
+        # df = df.append(vars(submission), ignore_index=True)
+
+# print(df)
+
+# df.to_csv('SuicideWatchRapi1.csv')

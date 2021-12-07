@@ -13,6 +13,7 @@ suicide_df = pd.read_csv(os.path.dirname(__file__) + '/../SuicideWatchCleaned.cs
 depression_df = pd.read_csv(os.path.dirname(__file__) + '/../DepressionCleaned.csv')
 
 df = pd.concat([suicide_df, depression_df])
+df = df.sample(frac=1)
 
 df['Label'] = df['Subreddit'].map({'depression' : 0, 'suicideWatch' : 1})
 
