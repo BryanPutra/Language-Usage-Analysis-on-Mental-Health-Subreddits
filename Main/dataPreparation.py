@@ -2,6 +2,7 @@
 import pandas as pd
 import string
 import nltk
+import contractions
 # nltk.download('punkt')
 # nltk.download('stopwords')
 from sklearn.feature_extraction.text import CountVectorizer
@@ -11,6 +12,7 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem.snowball import SnowballStemmer
 stemmer = SnowballStemmer('english')
 nltkStopWords = stopwords.words('english')
+print(nltkStopWords)
 spelling = SpellChecker('en')
 # we don't want to remove negation words because those words are important to understand the context of the content
 # so we remove the negation words that are in the stopwords list
@@ -33,7 +35,15 @@ def removePunctuation(text):
     newText = text.translate(str.maketrans('', '', string.punctuation))
     return newText
 
-stopWordsPunctuationRemoved = [removePunctuation(word) for word in nltkStopWords]
+def expandContractions(text):
+    result = []
+    textList = text.split()
+    for word in textList:
+        result.append(contractions.fix(word))
+    resultString = ' '.join(result)
+    return resultString
+
+# stopWordsPunctuationRemoved = [removePunctuation(word) for word in nltkStopWords]
 
 dfSuicideWatch = pd.read_csv('./Datasets/SuicideWatchRapi.csv', low_memory=False)
 dfIndex = dfSuicideWatch.index
@@ -43,9 +53,9 @@ pd.set_option('display.max_columns', None)
 # print(dfSuicideWatch.head(10))
 
 # get indexes of the rows that have null values and store it to an array
-isNullRow = dfSuicideWatch.isnull().any(axis=1)
-dfNullIndexes = dfIndex[isNullRow]
-dfNullIndexList = dfNullIndexes.tolist()
+# isNullRow = dfSuicideWatch.isnull().any(axis=1)
+# dfNullIndexes = dfIndex[isNullRow]
+# dfNullIndexList = dfNullIndexes.tolist()
 # print(dfNullIndexList)
 
 # dropping null rows according to the indexes stored from the previous code
@@ -53,9 +63,8 @@ dfSuicideWatch.drop(dfNullIndexList, inplace=True)
 print(dfSuicideWatch)
 # print(dfSuicideWatch.dtypes)
 
-
-textTest = dfSuicideWatch.at[7, 'Content']
-textTest = removePunctuation(textTest).lower()
+textTest = dfSuicideWatch.at[7, 'Content'].lower()
+textTest = expandContractions(textTest).lower()
 textTest = checkSpelling(textTest)
 print(textTest)
 
