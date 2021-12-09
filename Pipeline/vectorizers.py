@@ -1,7 +1,7 @@
 import nltk
 from pandas.core.frame import DataFrame
 
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import RocCurveDisplay,classification_report,ConfusionMatrixDisplay, confusion_matrix, accuracy_score
 import sklearn.metrics as met
@@ -18,6 +18,7 @@ def generalVectorizer(df, vc, xColumn, yColumn, clf, name):
     X = df[xColumn]
     y = df[yColumn]
     X = vc.fit_transform(X)
+    X = TfidfTransformer().fit_transform(X)
 
     y_pred, y_test = classify(X, y, clf)
     name = name + " "  + clf.__class__.__name__

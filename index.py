@@ -8,6 +8,7 @@ from Pipeline.vectorizers import cvec, tfidf
 
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import SVC, LinearSVC, NuSVC
+from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import classification_report
 from sklearn.tree import DecisionTreeClassifier
 
