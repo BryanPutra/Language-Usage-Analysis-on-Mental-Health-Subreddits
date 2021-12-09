@@ -43,7 +43,6 @@ def createDataframe(subredditList : list, featureColumnList : list):
     removePunctuationInColumn(df, featureColumn)
     
     # Preprocessing goes here
-    print(df[featureColumn].head(10))
     df['Label'] = df['Subreddit'].map(label)
     df = df.sample(frac = 1)
     return df, featureColumn

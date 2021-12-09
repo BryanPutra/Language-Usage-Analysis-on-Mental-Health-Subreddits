@@ -11,3 +11,5 @@ def showConfusionMatrix(y_test, y_pred):
 def showROCCurve(y_test, y_pred):
     # RocCurveDisplay.from_predictions(y_test, y_pred, ax = ax2)
     RocCurveDisplay.from_predictions(y_test, y_pred)
+
+# def modelInfo(modelName, ):

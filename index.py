@@ -11,8 +11,8 @@ from sklearn.svm import SVC, LinearSVC, NuSVC
 from sklearn.metrics import classification_report
 from sklearn.tree import DecisionTreeClassifier
 
-subreddits = ['suicideWatch', 'depression', 'CasualConversation']
-features = ['Content']
+subreddits = ['suicideWatch', 'depression']
+features = ['Title', 'Content']
 
 df, selectedColumn = dfUtil.createDataframe(subreddits, features)
 
