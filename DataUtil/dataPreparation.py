@@ -1,18 +1,21 @@
 
 import pandas as pd
-import string
 import nltk
 import contractions
+import dataframeUtility
 # nltk.download('punkt')
 # nltk.download('stopwords')
+# nltk.download('wordnet')
 from sklearn.feature_extraction.text import CountVectorizer
 from spellchecker import SpellChecker
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
-from nltk.stem.snowball import SnowballStemmer
-stemmer = SnowballStemmer('english')
+from nltk.stem import WordNetLemmatizer
+
+
+lemmatizer = WordNetLemmatizer()
+
 nltkStopWords = stopwords.words('english')
-print(nltkStopWords)
 spelling = SpellChecker('en')
 # we don't want to remove negation words because those words are important to understand the context of the content
 # so we remove the negation words that are in the stopwords list
@@ -29,7 +32,8 @@ def checkSpelling(text):
             correctResult.append(spelling.correction(word))
         else:
             correctResult.append(word)
-    return " ".join(correctResult)
+    resultString = ' '.join(correctResult)
+    return resultString
 
 def removePunctuation(text):
     newText = text.translate(str.maketrans('', '', string.punctuation))
@@ -43,44 +47,42 @@ def expandContractions(text):
     resultString = ' '.join(result)
     return resultString
 
-# stopWordsPunctuationRemoved = [removePunctuation(word) for word in nltkStopWords]
+def removeStopWords(textList):
+    removed = []
+    for word in textList:
+        if word not in nltkStopWords:
+            removed.append(word)
+    return removed
 
-dfSuicideWatch = pd.read_csv('./Datasets/SuicideWatchRapi.csv', low_memory=False)
-dfIndex = dfSuicideWatch.index
+def lemmatizeWords(textList):
+    lemmatized = [lemmatizer.lemmatize(word) for word in textList]
+    lemmatizedString = ' '.join(lemmatized)
+    return lemmatizedString
+
+def processContent(text):
+    tokenized = word_tokenize(text)
+    result = removeStopWords(tokenized)
+    result = lemmatizeWords(result)
+    return result
+
 
 # set to when calling a dataframe, it displays all the columns
 pd.set_option('display.max_columns', None)
-# print(dfSuicideWatch.head(10))
+dfSuicideWatch = pd.read_csv('./Datasets/suicideWatchCleaned.csv', low_memory=False)
+dfDepression = pd.read_csv('./Datasets/depressionCleaned.csv', low_memory=False)
+df = pd.concat([dfSuicideWatch, dfDepression])
 
-# get indexes of the rows that have null values and store it to an array
-# isNullRow = dfSuicideWatch.isnull().any(axis=1)
-# dfNullIndexes = dfIndex[isNullRow]
-# dfNullIndexList = dfNullIndexes.tolist()
-# print(dfNullIndexList)
+df['Label'] = df['Subreddit'].map({'depression' : 0, 'suicideWatch' : 1})
 
-# dropping null rows according to the indexes stored from the previous code
-dfSuicideWatch.drop(dfNullIndexList, inplace=True)
-print(dfSuicideWatch)
-# print(dfSuicideWatch.dtypes)
+dataframeUtility.fillColumnWithEmptyString(df, 'Content')
+dataframeUtility.addPrefixToStringColumn(df, 'Content', ' ')
+df['TitleAndContent'] = df['Title'] + df['Content'] 
+# dataframeUtility.removePunctuationInColumn(df, 'TitleAndContent')
 
-textTest = dfSuicideWatch.at[7, 'Content'].lower()
-textTest = expandContractions(textTest).lower()
-textTest = checkSpelling(textTest)
-print(textTest)
+df['TitleAndContent'] = df['TitleAndContent'].map(lambda x: expandContractions(x))
+# check spelling takes 1 year to finish omegalul
+df['TitleAndContent'] = df['TitleAndContent'].map(lambda x: checkSpelling(x))
+df['TitleAndContent'] = df['TitleAndContent'].map(lambda x: processContent(x))
+print(df.head(10)['TitleAndContent'])
 
-tokenizedTextTest = word_tokenize(textTest)
-print(tokenizedTextTest)
-filteredWords = []
-for word in tokenizedTextTest:
-    if word not in stopWordsPunctuationRemoved:
-        filteredWords.append(word)
-print(filteredWords)
-print("\n")
-print(len(tokenizedTextTest))
-print(len(filteredWords))
-stemmedWords = [stemmer.stem(word) for word in filteredWords]
-print(stemmedWords)
 
-# using the apply function from pandas dataframe would operate on the whole row
-# use .map() instead to operate on once cell at a time
-# dfSuicideWatch['Content'].map(lambda content: )
