@@ -49,11 +49,10 @@ def printSubmissionAttributes(submission):
     pprint.pprint(vars(submission))
 
 # Change subreddit to get datasets from other subreddit topic
-subredditName = 'CasualConversation'
-
+subredditName = 'depression'
 
 # Change subreddit to get datasets from other subreddit topic for now its r/suicidewatch
-for submission in reddit.subreddit(subredditName).hot(limit = 1000):
+for submission in reddit.subreddit(subredditName).new(limit = 2000):
     # print('Title: {},\nUsername: {},\nContent Post: {},\nUpvotes: {},\nAwards: {}'.format(submission.title, submission.author.name, submission.selftext, submission.ups, submission.all_awardings))
     if not submission.stickied and submission.is_self:
         authorName = ""
