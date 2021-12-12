@@ -3,10 +3,6 @@ import pprint
 import pandas as pd
 import re
 
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
-
 from datetime import datetime
 from config import REDDIT_API as redditCredentials
 
@@ -49,7 +45,8 @@ def printSubmissionAttributes(submission):
     pprint.pprint(vars(submission))
 
 # Change subreddit to get datasets from other subreddit topic
-subredditName = 'depression'
+subredditName = 'SuicideWatch'
+
 
 # Change subreddit to get datasets from other subreddit topic for now its r/suicidewatch
 for submission in reddit.subreddit(subredditName).new(limit = 2000):

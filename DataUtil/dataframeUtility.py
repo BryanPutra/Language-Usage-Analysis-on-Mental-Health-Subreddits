@@ -9,6 +9,10 @@ def fillColumnWithAverage(df, column):
     df[column].fillna(value = df[column].mean(), inplace=True)
     return df
 
+def fillColumnWithMode(df, column):
+    df[column].fillna(value = df[column].mode().sample(n=1, random_state=1), inplace=True)
+    return df
+
 def dropRowOnEmptyColumn(df, column):
     df[column].dropna(subset = column, inplace=True)
     return df
@@ -20,6 +24,7 @@ def removePunctuationInColumn(df, column):
 def addPrefixToStringColumn(df, column, prefix):
     df[column] = prefix + df[column].astype(str)
     return df[column]
+
 
 def createDataframe(subredditList : list, featureColumnList : list):
     df = []
