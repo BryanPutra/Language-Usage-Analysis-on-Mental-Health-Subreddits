@@ -3,6 +3,8 @@ import pandas as pd
 import nltk
 import contractions
 import dataframeUtility
+import emoji
+import re
 # nltk.download('punkt')
 # nltk.download('stopwords')
 # nltk.download('wordnet')
@@ -12,9 +14,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem import WordNetLemmatizer
 
-
 lemmatizer = WordNetLemmatizer()
-
 nltkStopWords = stopwords.words('english')
 spelling = SpellChecker('en')
 # we don't want to remove negation words because those words are important to understand the context of the content
@@ -22,6 +22,11 @@ spelling = SpellChecker('en')
 nltkStopWords.remove("not")
 nltkStopWords.remove("nor")
 nltkStopWords.remove("no")
+
+def removeEmoji(text):
+    text = emoji.demojize(text)
+    text = re.sub(r'(:[!_\-\w]+:)', '', text)
+    return text
 
 def checkSpelling(text):
     correctResult = []
@@ -65,8 +70,7 @@ def processContent(text):
     result = lemmatizeWords(result)
     return result
 
-
-# set to when calling a dataframe, it displays all the columns
+set to when calling a dataframe, it displays all the columns
 pd.set_option('display.max_columns', None)
 dfSuicideWatch = pd.read_csv('./Datasets/suicideWatchCleaned.csv', low_memory=False)
 dfDepression = pd.read_csv('./Datasets/depressionCleaned.csv', low_memory=False)
@@ -79,9 +83,10 @@ dataframeUtility.addPrefixToStringColumn(df, 'Content', ' ')
 df['TitleAndContent'] = df['Title'] + df['Content'] 
 # dataframeUtility.removePunctuationInColumn(df, 'TitleAndContent')
 
+df['TitleAndContent'] = df['TitleAndContent'].map(lambda x: removeEmoji(x))
 df['TitleAndContent'] = df['TitleAndContent'].map(lambda x: expandContractions(x))
 # check spelling takes 1 year to finish omegalul
-df['TitleAndContent'] = df['TitleAndContent'].map(lambda x: checkSpelling(x))
+# df['TitleAndContent'] = df['TitleAndContent'].map(lambda x: checkSpelling(x))
 df['TitleAndContent'] = df['TitleAndContent'].map(lambda x: processContent(x))
 print(df.head(10)['TitleAndContent'])
 
