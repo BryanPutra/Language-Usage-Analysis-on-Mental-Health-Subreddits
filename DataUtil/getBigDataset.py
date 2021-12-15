@@ -18,9 +18,9 @@ reddit = praw.Reddit(
 )
 
 # Change subreddit to get datasets from other subreddit topic
-subredditName = 'SuicideWatch'
+subredditName = 'Depression'
 api = PushshiftAPI(reddit)
-gen = api.search_submissions(subreddit='SuicideWatch', limit=10000)
+gen = api.search_submissions(subreddit=subredditName, limit=100000)
 
 df = pd.DataFrame()
 pd.set_option('display.max_columns', None)
@@ -45,13 +45,13 @@ for submission in gen:
     # print('Title: {},\nUsername: {},\nContent Post: {},\nUpvotes: {},\nAwards: {}'.format(submission.title, submission.author.name, submission.selftext, submission.ups, submission.all_awardings))
     if not submission.stickied and submission.is_self:
         authorName = ""
-        accountAge = 0
+        # accountAge = 0
         if(submission.selftext == '[deleted]' or submission.selftext == '[removed]'):
             # Ignore deleted submissions
             continue
         elif(not (submission.author is None)):
             authorName = submission.author.name
-            accountAge = getAccountAge(authorName)
+            # accountAge = getAccountAge(authorName)
 
         if(not submission.selftext is None):
             submissionContent = submission.selftext.replace("\n", "")
@@ -66,39 +66,10 @@ for submission in gen:
             'Content': submissionContent,
             'Upvotes': submission.ups,
             'NumberOfComments': submission.num_comments,
-            'AccountCreatedEpoch' : accountAge,
+            # 'AccountCreatedEpoch' : accountAge,
             'Subreddit' : subredditName
         }, ignore_index=True)
 
 print(df.head(10))
-df.to_csv(subredditName + 'BigCleaned.csv', index=False)
+df.to_csv(subredditName + 'BigCleaned1.csv', index=False)
 
-# Change subreddit to get datasets from other subreddit topic for now its r/suicidewatch
-# for submission. in reddit.subreddit(subredditName).hot(limit = 1000):
-#     # print('Title: {},\nUsername: {},\nContent Post: {},\nUpvotes: {},\nAwards: {}'.format(submission.title, submission.author.name, submission.selftext, submission.ups, submission.all_awardings))
-#     if not submission.stickied and submission.is_self:
-#         authorName = ""
-#         accountAge = 0
-#         if(submission.selftext == '[deleted]' or submission.selftext == '[removed]'):
-#             # Ignore deleted submissions
-#             continue
-#         elif(not (submission.author is None)):
-#             authorName = submission.author.name
-#             accountAge = getAccountAge(authorName)
-
-#         if(not submission.selftext is None):
-#             submissionContent = submission.selftext.replace("\n", "")
-        
-#         # Lowercase content
-#         submissionTitle = submission.title.lower()
-#         submissionContent = submissionContent.lower()
-        
-#         df = df.append({
-#             'Title': submissionTitle,
-#             'Username': authorName,
-#             'Content': submissionContent,
-#             'Upvotes': submission.ups,
-#             'NumberOfComments': submission.num_comments,
-#             'AccountCreatedEpoch' : accountAge,
-#             'Subreddit' : subredditName
-#         }, ignore_index=True)
