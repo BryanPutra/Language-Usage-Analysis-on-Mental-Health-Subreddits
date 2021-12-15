@@ -18,7 +18,7 @@ reddit = praw.Reddit(
 )
 
 # Change subreddit to get datasets from other subreddit topic
-subredditName = 'Depression'
+subredditName = 'CasualConversation'
 api = PushshiftAPI(reddit)
 gen = api.search_submissions(subreddit=subredditName, limit=100000)
 
@@ -71,5 +71,4 @@ for submission in gen:
         }, ignore_index=True)
 
 print(df.head(10))
-df.to_csv(subredditName + 'BigCleaned1.csv', index=False)
-
+df.to_csv(subredditName + 'HugeCleaned.csv', index=False)
