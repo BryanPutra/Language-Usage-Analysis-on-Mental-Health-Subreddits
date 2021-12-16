@@ -3,10 +3,6 @@ import pprint
 import pandas as pd
 import re
 
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
-
 from datetime import datetime
 from config import REDDIT_API as redditCredentials
 
@@ -37,23 +33,25 @@ df = pd.DataFrame()
 # get account age
 def getAccountAge(authorName):
     createdEpoch = 0
-    redditor = reddit.redditor(authorName)
     try:
+        redditor = reddit.redditor(authorName)
         createdEpoch = redditor.created_utc
     except AttributeError:
         print(authorName)
         print("Could not get attribute")
+    except:
+        print("HTTP Error")
     return createdEpoch
 
 def printSubmissionAttributes(submission):
     pprint.pprint(vars(submission))
 
 # Change subreddit to get datasets from other subreddit topic
-subredditName = 'CasualConversation'
+subredditName = 'SuicideWatch'
 
 
 # Change subreddit to get datasets from other subreddit topic for now its r/suicidewatch
-for submission in reddit.subreddit(subredditName).hot(limit = 1000):
+for submission in reddit.subreddit(subredditName).new(limit = 2000):
     # print('Title: {},\nUsername: {},\nContent Post: {},\nUpvotes: {},\nAwards: {}'.format(submission.title, submission.author.name, submission.selftext, submission.ups, submission.all_awardings))
     if not submission.stickied and submission.is_self:
         authorName = ""
