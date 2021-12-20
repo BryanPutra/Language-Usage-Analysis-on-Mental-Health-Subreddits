@@ -60,7 +60,7 @@ def createDataframe(subredditList : list, featureColumnList : list, nrows : int 
     
     # Combines all the file into one big dataframe
     for count, s in enumerate(subredditList):
-        df.append(pd.read_csv(os.path.dirname(__file__) + '/../Datasets/' + s + 'BigCleaned.csv', nrows=nrows))
+        df.append(pd.read_csv(os.path.dirname(__file__) + '/../Datasets/' + s + 'HugeCleaned.csv', nrows=nrows))
         label[s] = count
     df = pd.concat(df)
     df[featureColumn] = ""
@@ -83,6 +83,14 @@ def createDataframe(subredditList : list, featureColumnList : list, nrows : int 
     df['Label'] = df['Subreddit'].map(label)
     df = df.sample(frac = 1)
     df.info()
+    df.to_csv(os.path.dirname(__file__) + '/../Datasets/CombinedHugeCleaned.csv')
+    return df, featureColumn
+
+def getDataframeFromCachedFile(featureColumnList, nrows):
+    df = pd.read_csv(os.path.dirname(__file__) + '/../Datasets/CombinedHugeCleaned.csv', nrows=nrows)
+    featureColumn = 'Feature' + ''.join(featureColumnList)
+    if(df[featureColumn].empty):
+        print('Feature column does not exist')
     return df, featureColumn
 
 def removeEmoji(text):

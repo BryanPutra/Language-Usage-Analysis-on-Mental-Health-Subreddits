@@ -16,8 +16,13 @@ from tensorflow.keras.layers import Dense, Dropout, LSTM, Embedding, Bidirection
 EMBEDDING_SIZE = 300
 VOCABULARY_SIZE = 10000
 SEQUENCE_LENGTH = 300
-def load_data(subredditList, featureColumnList):
-    df, selectedColumn = dfUtil.createDataframe(subredditList, featureColumnList, 25000)
+def load_data(subredditList, featureColumnList, fromfile=False, nrows=5000):
+    df = pd.DataFrame()
+    selectedColumn = ""
+    if(fromfile):
+        df, selectedColumn = dfUtil.getDataframeFromCachedFile(featureColumnList, nrows)
+    else:
+        df, selectedColumn = dfUtil.createDataframe(subredditList, featureColumnList, nrows)
 
     tokenizer = Tokenizer(num_words=VOCABULARY_SIZE, oov_token="<OOV>")
     tokenizer.fit_on_texts(df[selectedColumn])
@@ -65,20 +70,20 @@ def create_model(word_index,
               trainable=False,
               input_length=sequence_length))
     # model.add(Embedding(len(word_index) + 1, embedding_size, input_length=sequence_length))
-    model.add(LSTM(unit, return_sequences=True))
-    model.add(LSTM(unit, return_sequences=True))
-    model.add(LSTM(unit, return_sequences=False))
+    model.add(Bidirectional(LSTM(unit, return_sequences=True)))
+    model.add(Bidirectional(LSTM(unit, return_sequences=True)))
+    model.add(Bidirectional(LSTM(unit, return_sequences=False)))
     model.add(Dense(output_length, activation="sigmoid"))
     # model.add(Dense(output_length, activation="relu"))
     # Compile the model
     model.compile(optimizer=optimizer, loss=loss, metrics=["accuracy"])
     return model
 
-subreddits = ['SuicideWatch', 'Depression']
+subreddits = ['Depression', 'CasualConversation']
 features = ['Title', 'Content']
 
-data = load_data(subreddits, features)
-model = create_model(data["tokenizer"].word_index)
+data = load_data(subreddits, features, False, 1000)
+model = create_model(data["tokenizer"].word_index, output_length=len(subreddits))
 model.summary()
 
 history = model.fit(data["X_train"], data["y_train"],

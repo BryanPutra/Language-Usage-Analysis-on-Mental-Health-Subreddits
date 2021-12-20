@@ -12,7 +12,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import classification_report
 from sklearn.tree import DecisionTreeClassifier
 
-subreddits = ['SuicideWatch', 'Depression']
+subreddits = ['SuicideWatch', 'CasualConversation']
 features = ['Title', 'Content']
 
 df, selectedColumn = dfUtil.createDataframe(subreddits, features, 25000)
@@ -21,4 +21,4 @@ df, selectedColumn = dfUtil.createDataframe(subreddits, features, 25000)
 print(df.dropna(subset=['FeatureTitleContent'], inplace=True))
 print(df.dropna(subset=['Title'], inplace=True))
 print(df.isna().sum())
-cvec(df, 'FeatureTitleContent', 'Label', MultinomialNB()) 
+cvec(df, 'FeatureTitleContent', 'Label', SVC()) 
