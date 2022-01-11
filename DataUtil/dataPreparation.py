@@ -114,16 +114,37 @@ def visualizeTopBar(dataframe, subredditName, n):
     plt.savefig('{}TopWordsBar.png'.format(subredditName))
     plt.show()
 
-dfSuicideWatch = pd.read_csv('./Datasets/suicideWatchCleaned.csv', low_memory=False)
-dfDepression = pd.read_csv('./Datasets/depressionCleaned.csv', low_memory=False)
+# def visualizeTotalDataset(dataframe1, dataframe2):
+#     dataframe1 
+#     df1Count = len(dataframe1.index)
+#     df2Count = len(dataframe2.index)
+#     tempDf = pd.DataFrame
 
-dfSuicideWatch = processContentDataSet(dfSuicideWatch)
-dfDepression = processContentDataSet(dfDepression)
+# dfSuicideWatch = pd.read_csv('./Datasets/suicideWatchCleaned.csv', low_memory=False)
+# dfDepression = pd.read_csv('./Datasets/depressionCleaned.csv', low_memory=False)
+
+dfSuicideWatchMale = pd.read_csv('./Datasets/MaleSuicideWatch.csv', low_memory=False)
+dfSuicideWatchFemale = pd.read_csv('./Datasets/FemaleSuicideWatch.csv', low_memory=False)
+dfDepressionMale = pd.read_csv('./Datasets/MaleDepression.csv', low_memory=False)
+dfDepressionFemale = pd.read_csv('./Datasets/FemaleDepression.csv', low_memory=False)
+totalMaleRows = len(dfSuicideWatchMale) + len(dfDepressionMale)
+totalFemaleRows = len(dfSuicideWatchFemale) + len(dfDepressionFemale)
+
+# dfSuicideWatch = processContentDataSet(dfSuicideWatch)
+# dfDepression = processContentDataSet(dfDepression)
 
 # visualizeCloud(dfSuicideWatch, 'SuicideWatch', 'TitleAndContent')
 # visualizeCloud(dfDepression, 'Depression', 'TitleAndContent')
 # visualizeTopBar(dfSuicideWatch, 'SuicideWatch', 20)
 # visualizeTopBar(dfDepression, 'Depression', 20)
 
+# visualize gender difference
 
-
+columns = ['Male', 'Female']
+rows = [totalMaleRows, totalFemaleRows]
+plt.bar(columns, rows, color=['lightblue', 'pink'])
+plt.title('Gender Comparison in SuicideWatch and Depression Subreddits')
+plt.xlabel('Gender')
+plt.ylabel('Authors')
+plt.savefig('genderComparisonBar.png')
+plt.show()
